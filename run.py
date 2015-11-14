@@ -1,5 +1,5 @@
 import json
-from flask import Flask
+from flask import Flask, render_template
 import urllib.request
 import pandas as pd
 
@@ -49,21 +49,26 @@ def get_min_weather(weather_df):
 
 @app.route('/')
 def index():
-    return 'Hello! Welcome to the temperature city calculator'
+    return render_template('index.html')
 
 @app.route('/warmest_city/')
 def warmest_city():
     weather_df = fetch_weather()
     weather_df = transform_kelvin_to_celsius(weather_df)
     (max_temp_city, max_temp) = get_max_weather(weather_df)
-    return '%s, %s' % (max_temp_city, max_temp)
+    context = {'city_name': max_temp_city,
+                'temp': str(max_temp)}
+    return render_template('base_city_temp.html', context=context)
 
 @app.route('/coldest_city/')
 def coldest_city():
     weather_df = fetch_weather()
     weather_df = transform_kelvin_to_celsius(weather_df)
     (min_temp_city, min_temp) = get_min_weather(weather_df)
-    return '%s, %s' % (min_temp_city, min_temp)
+    context = {'city_name': min_temp_city,
+                'temp': min_temp}
+    return render_template('base_city_temp.html', context=context)
+
 
 if __name__ == '__main__':
     app.run()
