@@ -18,6 +18,10 @@ cities = {'amsterdam': '6544881',
 API_KEY = 'afeab278b59f85b0a0305ab7d5dbb968'
 
 def fetch_weather():
+    '''Pulls data for European capitals from OpenWeatherMap. Returns a pandas DataFrame
+    with the temperature results.
+    returns: pd.DataFrame, 'Name' and 'Temperature' columns
+    '''
     city_ids = ','.join(cities.values())
     url = 'http://api.openweathermap.org/data/2.5/group?id=%s&APPID=%s' % (city_ids, API_KEY)
     response = urllib.request.urlopen(url)
@@ -30,12 +34,25 @@ def fetch_weather():
     return weather_df
 
 def transform_kelvin_to_celsius(weather_df):
+    '''
+    Given some pandas dataframe with name and temperature columns,
+    transforms the temperature column from Kelvin to Celsius.
+    args: weather_df: pd Dataframe with 'Name' and 'Temperature' columns
+        returns: pd Dataframe with 'Name' and 'Temperature' columns
+    '''
     conversion_list = [ 273.15 ] * len(weather_df)
     weather_df['Temperature'] = weather_df['Temperature'].subtract(conversion_list)
     return weather_df
 
 
 def get_max_weather(weather_df):
+    '''
+    Given some pandas dataframe with name and temperature columns,
+    returns a two-value tuple with the highest temperature identified
+    in the df, as well as its corresponding city name.
+    Args: weather_df: pd Dataframe with 'Name' and 'Temperature' columns
+        returns: (max_temp_city: str, max_temp: float)
+    '''
     max_temp_row = weather_df['Temperature'].argmax()
     max_temp_city = weather_df.ix[max_temp_row, 'Name']
     max_temp = weather_df.ix[max_temp_row, 'Temperature']
